@@ -8,10 +8,12 @@ Convolutional Neural Networks (CNNs) can extract relevant features from raw imag
 Linux
 ```
 virtualenv venv && source venv/bin/activate && pip install -r requirements.txt
+pip install -e .
 ```
 Windows
 ```
 virtualenv venv && venv\scripts\activate && pip install -r requirements.txt
+pip install -e .
 ```
 
 ### Run
