@@ -8,6 +8,6 @@ setup(
     author_email = 'nennomp@gmail.com',
     description = 'Randomized Convolutional Residual Neural Networks paper code',
     url = 'https://github.com/NennoMP/randresnet',
-    #packages=['src'],
     packages=find_packages(),
+    python_requires='>=3.8',
 )
