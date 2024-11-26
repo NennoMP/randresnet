@@ -9,5 +9,5 @@ setup(
     description = 'Randomized Convolutional Residual Neural Networks paper code',
     url = 'https://github.com/NennoMP/randresnet',
     packages=find_packages(),
-    python_requires='>=3.8',
+    python_requires='>=3.12',
 )
