@@ -144,7 +144,8 @@ def get_dataloaders(
     random_state: int = 42,
 ) -> Tuple[DataLoader, DataLoader, DataLoader, DataLoader]:
     """
-    Perform a stratified train-val split of a given dataset. Then, return the corresponding dataloaders.
+    Perform a stratified train-val split of a given dataset. Then, return the corresponding 
+    dataloaders.
 
     Args:
         - full_train_dataset: the training set to split
@@ -211,7 +212,7 @@ def compute_mean_std(
     """
     data = torch.stack([dataset[i][0] for i in range(len(dataset))], dim=0).cpu().numpy()
 
-    # Calculate mean and std for each channel
+    # Compute mean and std for each channel
     if data.shape[1] == 1: # gray-scale
         mean = (data[:,0,:,:].mean(),)
         std = (data[:,0,:,:].std(),)

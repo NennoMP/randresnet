@@ -1,7 +1,8 @@
 """Implementation of randomized Residual Neural Networks (randResNet) in PyTorch.
 
 The architecture is inspired by the seminal paper [1]. The structure of this file is heavily 
-influenced by [2, 3]. In particular, the implementation of LambdaLayer and ResidualBlock is adapted from [3].
+influenced by [2, 3]. In particular, the implementation of LambdaLayer and ResidualBlock is 
+adapted from [3].
 
 References:
 [1] He et al., Deep Residual Learning for Image Recognition (2016), arXiv:1512.03385
@@ -160,7 +161,7 @@ def randresnet19k(hparams: dict) -> torch.nn.Module:
     hparams.pop('n_filters', None)
     return randResNet(n_filters=[478], **hparams)
 
-def randresnet74k(hparams: dict) -> torch.nn.Module:
-    """randResNet - 74K trainable parameters."""
+def randresnet75k(hparams: dict) -> torch.nn.Module:
+    """randResNet - 75K trainable parameters."""
     hparams.pop('n_filters', None)
     return randResNet(n_filters=[1875], **hparams)

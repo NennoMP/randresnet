@@ -136,11 +136,11 @@ def resnet4(hparams: dict) -> torch.nn.Module:
     return ResNet(num_blocks=[1], **hparams)
 
 def resnet6(hparams: dict) -> torch.nn.Module:
-    """ResNet4 - 19K trainable parameters."""
+    """ResNet6 - 19K trainable parameters."""
     hparams.pop('num_blocks', None)
     return ResNet(num_blocks=[1, 1], **hparams)
 
-def resnet4(hparams: dict) -> torch.nn.Module:
-    """ResNet4 - 74K trainable parameters."""
+def resnet8(hparams: dict) -> torch.nn.Module:
+    """ResNet8 - 75K trainable parameters."""
     hparams.pop('num_blocks', None)
     return ResNet(num_blocks=[1, 1, 1], **hparams)
