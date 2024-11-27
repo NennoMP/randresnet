@@ -6,6 +6,7 @@ import torch
 import torchvision
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Dataset, Subset
+from torchvision.datasets.vision import VisionDataset
 
 
 def get_mnist(
@@ -196,11 +197,13 @@ def get_dataloaders(
 
     return full_train_dataloader, train_dataloader, val_dataloader, test_dataloader
 
-def compute_mean_std(dataset: Dataset) -> Tuple[Tuple[float, float, float], Tuple[float, float, float]]:
+def compute_mean_std(
+    dataset: VisionDataset
+) -> Tuple[Tuple[float, float, float], Tuple[float, float, float]]:
     """Compute channel-wise mean and standard deviation of a given dataset.
 
     Args:
-        dataset: the dataset to compute mean and std
+        dataset: a (torchvision) dataset to compute mean and std
     
     Returns:
         mean: a tuple of mean values for each channel
