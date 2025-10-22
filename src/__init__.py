@@ -1,3 +1,5 @@
-"""Official code for the paper `YOUR PAPER TITLE HERE`"""
+"""Official code for randomized Residual Neural Networks (randResNet)."""
 
-__version__ = 0.1
+__author__ = "Matteo Pinna"
+__email__ = "nennomp@gmail.com"
+__version__ = "0.1"
