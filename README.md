@@ -1,6 +1,6 @@
 <div align="center">
 
-# Residual Reservoir Memory Networks
+# Randomized Residual Neural Networks
 
 ![code-quality](https://github.com/nennomp/randresnet/actions/workflows/code-quality.yml/badge.svg)
 [![license](https://img.shields.io/badge/License-MIT-green.svg?labelColor=gray)](https://github.com/nennomp/randresnet)
