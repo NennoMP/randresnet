@@ -114,28 +114,29 @@ class Trainer:
         self.model.train() if training else self.model.eval()
 
         correct = total = 0
-        for inputs, targets in tqdm(dataloader, disable=not show_progress):
-            inputs, targets = inputs.to(self.device), targets.to(self.device)
+        with torch.set_grad_enabled(training):
+            for x, y in tqdm(dataloader, disable=not show_progress):
+                x, y = x.to(self.device), y.to(self.device)
 
-            if training:
-                self.optimizer.zero_grad()
+                if training:
+                    self.optimizer.zero_grad()
 
-            outputs = self.model(inputs)
-            if targets.dim() > 1:
-                targets = targets.squeeze(1)
+                outputs = self.model(x)
+                if y.dim() > 1:
+                    y = y.squeeze(1)
 
-            loss = self.criterion(outputs, targets)
+                loss = self.criterion(outputs, y)
 
-            if training:
-                loss.backward()
-                self.optimizer.step()
+                if training:
+                    loss.backward()
+                    self.optimizer.step()
 
-            _, preds = torch.max(outputs, 1)
-            correct += torch.sum(preds == targets.data)
-            total += targets.size(0)
+                _, preds = torch.max(outputs, 1)
+                correct += torch.sum(preds == y.data)
+                total += y.size(0)
 
-            accuracy = correct / total
-            return accuracy
+        accuracy = correct / total
+        return accuracy
 
     def train(
         self, epochs: int = 100, patience: int = 10, show_progress: bool = False
@@ -165,56 +166,60 @@ class Trainer:
             (`energy_consumed`).
         """
         # Start carbon.io tracking
-        carbon_tracker = EmissionsTracker(log_level="error", save_to_file=False)
-        carbon_tracker.start()
+        with EmissionsTracker(log_level="error", save_to_file=False) as tracker:
+            self.model.to(self.device)
 
-        self.model.to(self.device)
+            # Train the model
+            epoch = 0
+            while epoch < epochs and self.patience_count <= patience:
+                train_accuracy = self._run_epoch(
+                    self.train_dataloader, training=True, show_progress=show_progress
+                )
+                val_accuracy = self._run_epoch(
+                    self.val_dataloader, training=False, show_progress=show_progress
+                )
 
-        # Train the model
-        epoch = 0
-        while epoch < epochs and self.patience_count <= patience:
-            train_accuracy = self._run_epoch(
-                self.train_dataloader, training=True, show_progress=show_progress
-            )
-            val_accuracy = self._run_epoch(
-                self.val_dataloader, training=False, show_progress=show_progress
-            )
+                self.history["train_accuracy"].append(train_accuracy)
+                self.history["val_accuracy"].append(val_accuracy)
+                print(
+                    f"Epoch {epoch + 1}/{epochs} - "
+                    f"Train Accuracy: {train_accuracy:.4f}, "
+                    f"Val Accuracy: {val_accuracy:.4f}."
+                )
 
-            self.history["train_accuracy"].append(train_accuracy)
-            self.history["val_accuracy"].append(val_accuracy)
-            print(
-                f"Epoch {epoch + 1}/{epochs} - "
-                f"Train Accuracy: {train_accuracy:.4f}, "
-                f"Val Accuracy: {val_accuracy:.4f}."
-            )
+                # If validation accuracy improved, update best model parameters
+                if val_accuracy >= self.best_val_accuracy:
+                    self.patience_count = 0
+                    self.best_epoch = epoch + 1
+                    self.best_val_accuracy = val_accuracy
+                    self.best_params = {
+                        k: v.cpu().clone() for k, v in self.model.state_dict().items()
+                    }
 
-            # If validation accuracy improved, update best model parameters
-            if val_accuracy >= self.best_val_accuracy:
-                self.patience_count = 0
-                self.best_epoch = epoch + 1
-                self.best_val_accuracy = val_accuracy
-                self.best_params = {
-                    k: v.cpu().clone() for k, v in self.model.state_dict().items()
-                }
+                # Check early-stopping
+                if val_accuracy <= self.best_val_accuracy:
+                    self.patience_count += 1
+                    if self.patience_count > patience:
+                        print(f"Early stopping at epoch {epoch + 1}.")
 
-            # Check early-stopping
-            if val_accuracy <= self.best_val_accuracy:
-                self.patience_count += 1
-                if self.patience_count > patience:
-                    print(f"Early stopping at epoch {epoch + 1}.")
-
-            epoch += 1
+                epoch += 1
 
         print(f"Restoring best weights from epoch {self.best_epoch}.")
         self.model.load_state_dict(self.best_params)  # restore best parameters
 
-        # End carbon.io tracking
-        carbon_data = carbon_tracker._prepare_emissions_data()
-        _ = carbon_tracker.stop()
+        train_accuracy = self._run_epoch(
+            self.train_dataloader, training=False, show_progress=show_progress
+        )
+        val_accuracy = self._run_epoch(
+            self.val_dataloader, training=False, show_progress=show_progress
+        )
+        test_accuracy = self._run_epoch(
+            self.test_dataloader, training=False, show_progress=show_progress
+        )
 
-        train_accuracy = self._run_epoch(self.train_dataloader)
-        val_accuracy = self._run_epoch(self.val_dataloader)
-        test_accuracy = self._run_epoch(self.test_dataloader)
+        # Get carbon data from tracker
+        carbon_data = tracker._prepare_emissions_data()
+
         print(
             f"Train Accuracy: {train_accuracy:.4f} - "
             f"Val Accuracy: {val_accuracy:.4f} - "

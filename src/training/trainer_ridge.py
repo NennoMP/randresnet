@@ -137,37 +137,34 @@ class TrainerRidge:
             (`energy_consumed`).
         """
         # Start carbon.io tracking
-        carbon_tracker = EmissionsTracker(log_level="error", save_to_file=False)
-        carbon_tracker.start()
+        with EmissionsTracker(log_level="error", save_to_file=False) as tracker:
+            self.model.to(self.device)
 
-        self.model.to(self.device)
+            outputs, targets = [], []
+            for x, y in tqdm(self.train_dataloader, disable=not show_progress):
+                x, y = x.to(self.device), y.to(self.device)
+                out = self.model(x)
+                outputs.append(out.cpu())
+                targets.append(y.cpu())
 
-        outputs, targets = [], []
-        for x, y in tqdm(self.train_dataloader, disable=not show_progress):
-            x, y = x.to(self.device), y.to(self.device)
-            out = self.model(x)
-            outputs.append(out.cpu())
-            targets.append(y.cpu())
+            # Fit the readout
+            outputs = torch.cat(outputs, dim=0)
+            targets = torch.cat(targets, dim=0)
+            self.readout.fit(outputs, targets)
 
-        # Fit the readout
-        outputs = torch.cat(outputs, dim=0)
-        targets = torch.cat(targets, dim=0)
-        self.readout.fit(outputs, targets)
+            # Evaluate
+            train_accuracy = accuracy_score(
+                y_true=targets, y_pred=self.readout.predict(outputs)
+            )
+            val_accuracy = self.evaluate(
+                dataloader=self.val_dataloader, show_progress=show_progress
+            )
+            test_accuracy = self.evaluate(
+                dataloader=self.test_dataloader, show_progress=show_progress
+            )
 
-        # End carbon.io tracking
-        carbon_data = carbon_tracker._prepare_emissions_data()
-        _ = carbon_tracker.stop()
-
-        # Evaluate
-        train_accuracy = accuracy_score(
-            y_true=targets, y_pred=self.readout.predict(outputs)
-        )
-        val_accuracy = self.evaluate(
-            dataloader=self.val_dataloader, show_progress=show_progress
-        )
-        test_accuracy = self.evaluate(
-            dataloader=self.test_dataloader, show_progress=show_progress
-        )
+        # Get carbon data from tracker
+        carbon_data = tracker._prepare_emissions_data()
 
         print(
             f"Train Accuracy: {train_accuracy:.4f} - "

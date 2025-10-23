@@ -81,10 +81,10 @@ class VisionDataLoader:
             targets. The latter are needed for stratified splitting.
         """
         full_train_dataset = dataset_class(
-            self.data_dir, train=True, transform=transforms, download=True
+            self.path, train=True, transform=transforms, download=True
         )
         test_dataset = dataset_class(
-            self.data_dir, train=False, transform=transforms, download=True
+            self.path, train=False, transform=transforms, download=True
         )
         return (full_train_dataset, test_dataset, full_train_dataset.targets)
 
@@ -107,10 +107,10 @@ class VisionDataLoader:
             targets. The latter are needed for stratified splitting.
         """
         full_train_dataset = dataset_class(
-            self.data_dir, split="train", transform=transforms, download=True
+            self.path, split="train", transform=transforms, download=True
         )
         test_dataset = dataset_class(
-            self.data_dir, split="test", transform=transforms, download=True
+            self.path, split="test", transform=transforms, download=True
         )
         return (full_train_dataset, test_dataset, full_train_dataset.labels)
 
@@ -119,7 +119,7 @@ class VisionDataLoader:
         dataset_name: str,
         val_split: float = 0.1,
         batch_size: int = 256,
-        num_workers: int = 4,
+        num_workers: int = 1,
         random_state: int = 42,
     ) -> tuple[DataLoader, DataLoader, DataLoader, DataLoader]:
         """Instantiate dataloaders for the specified dataset.
@@ -137,7 +137,7 @@ class VisionDataLoader:
             Validation split percentage.
         batch_size : int, optional, default=256
             Batch size for dataloaders.
-        num_workers : int, optional, default=4
+        num_workers : int, optional, default=1
             Number of worker processes for data loading.
         random_state : int, optional, default=42
             Random seed for reproducibility.
