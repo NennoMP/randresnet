@@ -10,12 +10,11 @@ from tqdm import tqdm
 
 
 class TrainerRidge:
-    """Trainer class for randomized models for classification tasks.
-
-    Extracts features via the forward pass of a randomized model, then trains a readout
-    layer on the extracted features. The readout is implemented as a ridge classifier
-    and optimized in closed-form solution. Tracks carbon data, including training time,
-    emissions, and energy consumption.
+    """Trains a randomized model by extracting features via a forward pass and training
+    a readout layer on top of the extracted features. The readout is implemented as a
+    ridge classifier and optimized in closed-form solution. Tracks computational
+    efficiency metrics (i.e., training time, energy consumption, CO2 emissions) via
+    codecarbon.
 
     Parameters
     ----------
@@ -46,19 +45,6 @@ class TrainerRidge:
         readout: RidgeClassifier | None,
         device: torch.device | None = None,
     ) -> None:
-        """
-        Args:
-            device: the device to run the model on.
-            model: the instance of the randomized model to use as a feature extractor.
-            train_dataloader: training data dataloader.
-            val_dataloader: validation data dataloader.
-            test_dataloader: test data dataloader.
-            classifier: linear classifier (readout) to be trained.
-            reg: regularization coefficient for the classifier.
-
-        Raises:
-            ValueError: if an invalid classifier is provided.
-        """
         self.device = device
         self.model = model
         self.train_dataloader = train_dataloader

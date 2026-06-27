@@ -8,10 +8,9 @@ from tqdm import tqdm
 
 
 class Trainer:
-    """Trainer class for fully-trainable models for classification tasks.
-
-    Trains a model via backpropagation with early-stoppin and tracking of carbon data,
-    including training time, emissions, and energy consumption.
+    """Trains a model via backpropagation with early-stopping. Tracks computational
+    efficiency metrics (i.e., training time, energy consumption, CO2 emissions) via
+    codecarbon.
 
     Parameters
     ----------
