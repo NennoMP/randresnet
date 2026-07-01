@@ -3,8 +3,6 @@
 # Randomized Residual Convolutional Neural Networks
 
 [![Paper](https://img.shields.io/badge/Paper-ScienceDirect-e96419.svg)](https://www.sciencedirect.com/science/article/pii/S0045790626004337)
-[![DOI](https://img.shields.io/badge/DOI-10.1016/j.compeleceng.2026.111363-blue.svg)](https://doi.org/10.1016/j.compeleceng.2026.111363)
-
 ![code-quality](https://github.com/nennomp/randresnet/actions/workflows/code-quality.yml/badge.svg)
 [![license](https://img.shields.io/badge/License-MIT-green.svg?labelColor=gray)](https://github.com/nennomp/randresnet)
 
